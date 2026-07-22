@@ -22,20 +22,6 @@ Una app web para calificar el rendimiento del plantel argentino en el Mundial 20
 6. Las notas enviadas se almacenan en el navegador de quien las carga.
 7. Cada columna enviada se puede eliminar desde su encabezado.
 
-## Cómo abrirla
-
-No necesita instalar dependencias ni levantar un servidor.
-
-1. Cloná el repositorio.
-2. Abrí `index.html` en el navegador.
-
-```bash
-git clone https://github.com/ccozz/argentinaScore.git
-cd argentinaScore
-```
-
-También se puede publicar como sitio estático en GitHub Pages.
-
 ## Archivos principales
 
 - `index.html`: estructura de la interfaz.
