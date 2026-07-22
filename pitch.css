@@ -1,0 +1,102 @@
+/* Pitch divided into simple positional zones. */
+.pitch {
+  background: var(--field);
+  border: 7px solid #e4d2a2;
+  box-shadow: 10px 10px 0 #c6ae7a;
+  padding: 0;
+  gap: 0;
+  height: 720px;
+  min-height: 0;
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+
+.pitch::before { display: none; }
+
+.position-group {
+  padding: 18px 5%;
+  border-top: 2px solid rgba(248, 234, 191, .55);
+  min-height: 0;
+}
+.position-group:first-of-type { border-top: 0; }
+.position-group > p { color: #f4dfaa; margin-bottom: 12px; }
+.shirt,
+.player.starter .shirt {
+  background: #123d70;
+  border: 1px solid #0c2b50;
+  color: #f8f0dc;
+  font-size: 13px;
+  line-height: 33px;
+}
+.player.off { opacity: .48; filter: grayscale(1); }
+.player.off select { cursor: not-allowed; background: #6c7467; color: #f6ebd3; }
+.off-table { color: #8c7461; font: 700 10px 'DM Mono', monospace; letter-spacing: .08em; }
+.score-missing { outline: 3px solid #b94136 !important; outline-offset: 2px; background: #fff0e7 !important; }
+.section-heading #resetScores {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #8f6d3c;
+  border-radius: 2px;
+  background: #efe0bd;
+  color: #513d24;
+  box-shadow: 3px 3px 0 #ad8a53;
+  padding: 10px 14px;
+  font: 700 10px 'DM Mono', monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.section-heading #resetScores span { font-size: 17px; line-height: 10px; }
+.section-heading #resetScores:hover { background: #e2c27f; transform: translate(2px,2px); box-shadow: 1px 1px 0 #ad8a53; }
+.avg-column { background: rgba(212, 174, 104, .12); font-weight: 800; color: #70491f; }
+#ratingsHead .avg-column { min-width: 100px; }
+#ratingsList tr:nth-child(even) td { background: rgba(125, 98, 54, .09); }
+#ratingsList tr:nth-child(even) td.avg-column { background: rgba(212, 174, 104, .2); }
+.player.starter .shirt {
+  background: #b9e0ed;
+  border-color: #d9f1f4;
+  color: #12314d;
+}
+
+#ratingsHead th.rater-column { min-width: 122px; vertical-align: top; }
+#ratingsHead th.rater-column,
+#ratingsHead .avg-column { min-width: 0; }
+.table-wrap table { table-layout: fixed; }
+.table-wrap th,
+.table-wrap td { overflow: hidden; text-overflow: ellipsis; }
+#ratingsHead th:first-child,
+#ratingsList td:first-child { text-align: left; }
+#ratingsHead th:nth-child(n+2):not(:last-child),
+#ratingsList td:nth-child(n+2):not(:last-child) { text-align: center; }
+#ratingsHead .avg-column,
+#ratingsList .avg-column { text-align: right !important; }
+.rater-name { display: block; color: var(--ink); font: 700 11px Manrope, sans-serif; letter-spacing: 0; text-transform: none; }
+.delete-rater { display: inline-block; margin-top: 7px; padding: 3px 5px; border: 1px solid #b79d71; background: transparent; color: #785a32; font: 500 8px 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.empty-ratings { text-align: center; color: #776d59; font-style: italic; }
+body.dark .rater-name { color: #f0e5cd; }
+body.dark .delete-rater { color: #e2c890; border-color: #8e7956; }
+body.dark .avg-column { color: #efd498; background: rgba(212, 174, 104, .16); }
+body.dark #ratingsList tr:nth-child(even) td { background: rgba(232, 217, 178, .08); }
+body.dark #ratingsList tr:nth-child(even) td.avg-column { background: rgba(212, 174, 104, .22); }
+body.dark .section-heading #resetScores { background: #3e392b; border-color: #a98a51; color: #f3dfb6; box-shadow: 3px 3px 0 #171b17; }
+body.dark .score-missing { background: #5a2d29 !important; outline-color: #ff8377 !important; }
+
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 700px) {
+  .pitch { height: auto; grid-template-rows: repeat(4, auto); }
+  .position-group { padding: 18px 8px 20px; }
+  .position-group > div { gap: 14px 5px; }
+  .player { width: 86px; }
+  .player-name { font-size: 9px; }
+  .player select { font-size: 10px; }
+  .coach-strip { margin-top: 13px; }
+  .coach-score { flex-wrap: wrap; justify-content: flex-end; }
+  .table-wrap table { min-width: 460px; }
+  #ratingsHead th.rater-column { min-width: 0; }
+  #ratingsHead .avg-column { min-width: 0; }
+  .section-heading #resetScores { padding: 9px 10px; font-size: 9px; }
+}
+
+body.dark .pitch { border-color: #9e875b; box-shadow: 10px 10px 0 #4a412c; }
