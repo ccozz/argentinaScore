@@ -22,9 +22,16 @@ Una app web para calificar el rendimiento del plantel argentino en el Mundial 20
 6. Las notas enviadas se almacenan en el navegador de quien las carga.
 7. Cada columna enviada se puede eliminar desde su encabezado.
 
+## Base de datos compartida
+
+La app usa Supabase para que todos vean las mismas evaluaciones. Antes de usarla por primera vez, abrí el proyecto en Supabase, entrá a **SQL Editor**, creá una consulta nueva, pegá el contenido de `supabase.sql` y ejecutalo una vez.
+
+Ese script crea la tabla compartida, evita nombres duplicados, habilita las operaciones públicas necesarias y activa la sincronización en tiempo real.
+
 ## Archivos principales
 
 - `index.html`: estructura de la interfaz.
 - `style.css`: estilo general y paleta vintage.
 - `pitch.css`: cancha, tabla y ajustes responsive.
 - `script.js`: plantel, puntajes, validaciones, promedios y almacenamiento local.
+- `supabase.sql`: estructura y permisos de la base de datos compartida.

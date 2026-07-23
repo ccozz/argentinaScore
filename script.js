@@ -8,6 +8,10 @@ const squad = [
 const targetMap={gk:'goalkeepers',def:'defenders',mid:'midfielders',fwd:'forwards'};
 const noMinutes=new Set(['Gerónimo Rulli','Juan Musso']);
 const positionCodes={Arquero:'ARQ',Defensor:'DEF',Mediocampista:'MED',Delantero:'DEL'};
+const supabaseUrl='https://pfpospcwwkyxkhtqhttx.supabase.co';
+const supabaseKey='sb_publishable_n2mdK4VkE_pXZqiWe7aBrw_rzkYqD1D';
+const supabase=window.supabase.createClient(supabaseUrl,supabaseKey);
+let submissionsCache=[];
 const scoreOptions=()=>'<option value="">—</option>'+Array.from({length:19},(_,i)=>{const n=(i+2)/2;return `<option value="${n}">${Number.isInteger(n)?n:n.toFixed(1)}</option>`}).join('');
 const escapeHtml=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 const entries=()=>[...squad.map(([name,role])=>({name,role:positionCodes[role]})),{name:'Lionel Scaloni',role:'DT'}];
@@ -30,8 +34,14 @@ raterName.addEventListener('input',()=>localStorage.setItem('arg26-rater-name',r
 
 function fmt(value){const rounded=Math.round(value*2)/2;return Number.isInteger(rounded)?String(rounded):rounded.toFixed(1);}
 function currentScores(){return entries().map(person=>({...person,eligible:!noMinutes.has(person.name),score:Number(document.querySelector(`[data-player="${person.name}"]`).value)}));}
-function getSubmissions(){try{return JSON.parse(localStorage.getItem('arg26-submissions')||'[]');}catch{return [];}}
-function setSubmissions(submissions){localStorage.setItem('arg26-submissions',JSON.stringify(submissions));}
+function getSubmissions(){return submissionsCache;}
+async function loadSubmissions(){
+  const {data,error}=await supabase.from('evaluations').select('id,rater_name,scores,created_at').order('created_at');
+  if(error){document.getElementById('submitStatus').textContent='No se pudieron cargar las evaluaciones compartidas.';return;}
+  submissionsCache=data.map(row=>({id:row.id,name:row.rater_name,scores:row.scores,submittedAt:row.created_at}));
+  renderRatingsTable();
+  updateSummary();
+}
 
 function updateSummary(){
   const submissions=getSubmissions();
@@ -66,14 +76,13 @@ function renderRatingsTable(){
   body.innerHTML=entries().map(person=>`<tr><td>${person.name}</td><td>${person.role}</td>${submissions.map(submission=>{const score=submissionScore(submission,person.name);return `<td>${noMinutes.has(person.name)?'<span class="off-table">OFF</span>':score===null?'—':fmt(Number(score))}</td>`;}).join('')}<td class="avg-column">${noMinutes.has(person.name)?'<span class="off-table">OFF</span>':averageForPlayer(submissions,person.name)}</td></tr>`).join('');
 }
 
-document.getElementById('ratingsHead').addEventListener('click',event=>{
+document.getElementById('ratingsHead').addEventListener('click',async event=>{
   const button=event.target.closest('[data-submission]');
   if(!button) return;
-  const submissions=getSubmissions();
-  submissions.splice(Number(button.dataset.submission),1);
-  setSubmissions(submissions);
-  renderRatingsTable();
-  updateSummary();
+  const submission=getSubmissions()[Number(button.dataset.submission)];
+  const {error}=await supabase.from('evaluations').delete().eq('id',submission.id);
+  if(error){window.alert('No se pudo eliminar la evaluación. Intentá de nuevo.');return;}
+  await loadSubmissions();
 });
 
 document.getElementById('resetScores').addEventListener('click',()=>{
@@ -89,7 +98,7 @@ document.getElementById('resetScores').addEventListener('click',()=>{
   updateSummary();
 });
 
-document.getElementById('submitScores').addEventListener('click',()=>{
+document.getElementById('submitScores').addEventListener('click',async()=>{
   const name=raterName.value.trim();
   const status=document.getElementById('submitStatus');
   const submissions=getSubmissions();
@@ -111,10 +120,19 @@ document.getElementById('submitScores').addEventListener('click',()=>{
     return;
   }
   const scores=currentScores().map(({name:playerName,eligible,score})=>({name:playerName,score:eligible&&score?score:null}));
-  submissions.push({name,scores,submittedAt:new Date().toISOString()});
-  setSubmissions(submissions);
-  renderRatingsTable();
-  updateSummary();
+  const button=document.getElementById('submitScores');
+  button.disabled=true;
+  button.textContent='Guardando…';
+  const {error}=await supabase.from('evaluations').insert({rater_name:name,scores});
+  button.disabled=false;
+  button.innerHTML='Enviar puntajes <span>→</span>';
+  if(error){
+    const message=error.code==='23505'?'Ya existe una evaluación enviada con ese nombre.':'No se pudieron guardar los puntajes. Intentá de nuevo.';
+    status.textContent=message;
+    window.alert(message);
+    return;
+  }
+  await loadSubmissions();
   status.textContent=`¡Listo, ${name}! Tu columna de puntajes quedó guardada.`;
 });
 
@@ -126,3 +144,5 @@ themeToggle.addEventListener('click',()=>{document.body.classList.toggle('dark')
 updateTheme();
 updateSummary();
 renderRatingsTable();
+loadSubmissions();
+supabase.channel('evaluations-live').on('postgres_changes',{event:'*',schema:'public',table:'evaluations'},loadSubmissions).subscribe();
