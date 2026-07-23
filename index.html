@@ -27,7 +27,9 @@
           <small id="ratedCount">0 de 27 calificados</small>
         </section>
       </header>
+      <nav class="bottom-nav" aria-label="Navegación principal"><button class="active" data-view-button="rate" type="button"><b>✦</b><span>Puntuar</span></button><button data-view-button="averages" type="button"><b>▤</b><span>Promedios</span></button><button data-view-button="worldcup" type="button"><b>◉</b><span>Mundial</span></button></nav>
 
+      <section class="app-view active" data-view="rate">
       <section class="rater-panel" aria-label="Persona que califica">
         <label for="raterName">¿Quién está calificando?</label>
         <input id="raterName" type="text" maxlength="60" autocomplete="name" placeholder="Escribí tu nombre" />
@@ -52,23 +54,42 @@
           <select data-player="Lionel Scaloni" aria-label="Puntaje de Lionel Scaloni"></select>
         </label>
       </section>
+      <div class="submit-area">
+        <div><strong>¿Terminaste tu evaluación?</strong><p>Al enviar, se guarda en este dispositivo con tu nombre y la fecha.</p></div>
+        <button id="submitScores" type="button">Enviar puntajes <span>→</span></button>
+      </div>
+      <p class="submit-status" id="submitStatus" role="status"></p>
+      </section>
 
+      <section class="app-view" data-view="averages">
       <section class="ratings-section">
         <div class="ratings-title"><div><p class="eyebrow"><span></span> Balance final</p><h2>Las calificaciones</h2></div></div>
+        <div class="ratings-controls"><div class="rating-position-filter" aria-label="Filtrar por posición"><button data-rating-position="all" type="button">Todo</button><button data-rating-position="ARQ" type="button">ARQ</button><button data-rating-position="DEF" type="button">DEF</button><button data-rating-position="MED" type="button">MED</button><button data-rating-position="DEL" type="button">DEL</button><button data-rating-position="DT" type="button">DT</button></div><label>Ordenar<select id="ratingSort"><option value="average">Mejor promedio global</option><option value="position">Mejor promedio por posición</option><option value="name">Nombre</option></select></label></div>
         <div class="table-wrap">
           <table>
             <thead id="ratingsHead"></thead>
             <tbody id="ratingsList"></tbody>
           </table>
         </div>
-        <div class="submit-area">
-          <div><strong>¿Terminaste tu evaluación?</strong><p>Al enviar, se guarda en este dispositivo con tu nombre y la fecha.</p></div>
-          <button id="submitScores" type="button">Enviar puntajes <span>→</span></button>
-        </div>
-        <p class="submit-status" id="submitStatus" role="status"></p>
+      </section>
+      </section>
+
+      <section class="app-view" data-view="worldcup">
+        <section class="worldcup-section">
+          <div class="section-heading"><div><p class="eyebrow"><span></span> Mundial 2026</p><h2>Argentina en el torneo</h2></div><p class="worldcup-badge">Subcampeón</p></div>
+          <div class="team-stat-grid team-stat-grid-expanded" id="teamTotals" aria-label="Estadísticas de Argentina en el Mundial"></div>
+          <div class="worldcup-copy"><strong>Camino a la final</strong><p>Argentina terminó primera en el Grupo J, superó a Cabo Verde, Egipto, Suiza e Inglaterra, y cayó 1–0 ante España en la final. Abrí cada partido para consultar las métricas del encuentro.</p><small>Datos verificados contra los Post Match Summary Reports de FIFA.</small></div>
+          <details class="stats-guide"><summary>¿Qué significa cada estadística?</summary><div><section><h3>Equipo</h3><p><strong>Goles esperados:</strong> estima cuántos goles podían esperarse por la calidad de las chances; considera, entre otras cosas, la distancia y el ángulo del remate.</p><p><strong>Remates / al arco:</strong> intentos de gol totales y los que fueron entre los tres palos.</p><p><strong>Rupturas de línea:</strong> pases, conducciones o acciones que superan líneas defensivas rivales.</p><p><strong>Recepciones en el tercio final:</strong> veces que Argentina recibió la pelota en el último tercio del campo.</p><p><strong>Progresiones:</strong> acciones que hacen avanzar la pelota hacia el arco rival. <strong>Presiones:</strong> acciones para incomodar al rival que tiene la pelota.</p><p><strong>Pérdidas forzadas:</strong> recuperaciones provocadas por la presión. <strong>Segundas pelotas:</strong> disputas por rebotes o balones sin dueño.</p></section><section><h3>Jugador</h3><p><strong>Promedio:</strong> cada ficha calcula el promedio del jugador sólo sobre los partidos en los que tuvo minutos. La línea <strong>+/-</strong> compara el dato del partido elegido contra ese promedio.</p><p><strong>Generales:</strong> minutos, goles, asistencias, remates / al arco, pases / precisión, pases clave, recuperaciones, duelos ganados, faltas y tarjetas.</p><p><strong>Según el puesto:</strong> arqueros suman atajadas, goles recibidos y vallas invictas; defensores, entradas, intercepciones, despejes y bloqueos; mediocampistas, rupturas de línea y progresiones; delanteros, goles esperados, asistencias esperadas, chances creadas y regates.</p><p>Las fichas no usan puntuaciones de proveedores externos: muestran únicamente acciones registradas del torneo.</p></section></div></details>
+          <div class="section-heading match-stats-heading"><div><p class="eyebrow"><span></span> Partido a partido</p><h2>Resultados y estadísticas</h2></div></div>
+          <div class="stage-filter" aria-label="Filtrar partidos por instancia"><button data-stage="all" type="button">Todo</button><button data-stage="group" type="button">Grupos</button><button data-stage="r32" type="button">16avos</button><button data-stage="r16" type="button">8vos</button><button data-stage="qf" type="button">4tos</button><button data-stage="sf" type="button">Semis</button><button data-stage="final" type="button">Final</button></div>
+          <div class="match-list" id="matchStats"></div>
+          <div class="section-heading player-stats-heading"><div><p class="eyebrow"><span></span> Rendimiento individual</p><h2>Estadísticas por jugador</h2></div><p class="stats-key">PJ · TIT · GOL</p></div>
+          <div class="player-stat-groups" id="playerStats"></div>
+        </section>
       </section>
     </main>
     <footer>Argentina 2026 <span>✦</span> Elegí notas de 1 a 10, en intervalos de 0,5.</footer>
+    <dialog class="player-dialog" id="playerDialog"><button class="dialog-close" id="closePlayerDialog" type="button" aria-label="Cerrar">×</button><div id="playerDialogContent"></div></dialog>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="script.js?v=__BUILD_ID__"></script>
   </body>
