@@ -10,7 +10,7 @@ const noMinutes=new Set(['Gerónimo Rulli','Juan Musso']);
 const positionCodes={Arquero:'ARQ',Defensor:'DEF',Mediocampista:'MED',Delantero:'DEL'};
 const supabaseUrl='https://pfpospcwwkyxkhtqhttx.supabase.co';
 const supabaseKey='sb_publishable_n2mdK4VkE_pXZqiWe7aBrw_rzkYqD1D';
-const supabase=window.supabase.createClient(supabaseUrl,supabaseKey);
+const supabaseClient=window.supabase?.createClient?window.supabase.createClient(supabaseUrl,supabaseKey):null;
 let submissionsCache=[];
 const scoreOptions=()=>'<option value="">—</option>'+Array.from({length:19},(_,i)=>{const n=(i+2)/2;return `<option value="${n}">${Number.isInteger(n)?n:n.toFixed(1)}</option>`}).join('');
 const escapeHtml=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
@@ -36,7 +36,8 @@ function fmt(value){const rounded=Math.round(value*2)/2;return Number.isInteger(
 function currentScores(){return entries().map(person=>({...person,eligible:!noMinutes.has(person.name),score:Number(document.querySelector(`[data-player="${person.name}"]`).value)}));}
 function getSubmissions(){return submissionsCache;}
 async function loadSubmissions(){
-  const {data,error}=await supabase.from('evaluations').select('id,rater_name,scores,created_at').order('created_at');
+  if(!supabaseClient){document.getElementById('submitStatus').textContent='No se pudo conectar con la base de datos compartida.';return;}
+  const {data,error}=await supabaseClient.from('evaluations').select('id,rater_name,scores,created_at').order('created_at');
   if(error){document.getElementById('submitStatus').textContent='No se pudieron cargar las evaluaciones compartidas.';return;}
   submissionsCache=data.map(row=>({id:row.id,name:row.rater_name,scores:row.scores,submittedAt:row.created_at}));
   renderRatingsTable();
@@ -80,7 +81,7 @@ document.getElementById('ratingsHead').addEventListener('click',async event=>{
   const button=event.target.closest('[data-submission]');
   if(!button) return;
   const submission=getSubmissions()[Number(button.dataset.submission)];
-  const {error}=await supabase.from('evaluations').delete().eq('id',submission.id);
+  const {error}=await supabaseClient.from('evaluations').delete().eq('id',submission.id);
   if(error){window.alert('No se pudo eliminar la evaluación. Intentá de nuevo.');return;}
   await loadSubmissions();
 });
@@ -123,7 +124,15 @@ document.getElementById('submitScores').addEventListener('click',async()=>{
   const button=document.getElementById('submitScores');
   button.disabled=true;
   button.textContent='Guardando…';
-  const {error}=await supabase.from('evaluations').insert({rater_name:name,scores});
+  if(!supabaseClient){
+    const message='No hay conexión con la base de datos compartida. Recargá e intentá de nuevo.';
+    status.textContent=message;
+    window.alert(message);
+    button.disabled=false;
+    button.innerHTML='Enviar puntajes <span>→</span>';
+    return;
+  }
+  const {error}=await supabaseClient.from('evaluations').insert({rater_name:name,scores});
   button.disabled=false;
   button.innerHTML='Enviar puntajes <span>→</span>';
   if(error){
@@ -145,4 +154,4 @@ updateTheme();
 updateSummary();
 renderRatingsTable();
 loadSubmissions();
-supabase.channel('evaluations-live').on('postgres_changes',{event:'*',schema:'public',table:'evaluations'},loadSubmissions).subscribe();
+if(supabaseClient) supabaseClient.channel('evaluations-live').on('postgres_changes',{event:'*',schema:'public',table:'evaluations'},loadSubmissions).subscribe();
